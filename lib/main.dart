@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:doctor_appointment_app/utils/config.dart';
 import 'package:doctor_appointment_app/screens/auth_page.dart';
-import 'package:doctor_appointment_app/screens/main_layout.dart';
+import 'package:doctor_appointment_app/main_layout.dart';
 
 void main() {
   runApp(const MyApp());

@@ -1,3 +1,6 @@
+import 'package:doctor_appointment_app/screens/booking_page.dart';
+import 'package:doctor_appointment_app/screens/doctor_details.dart';
+import 'package:doctor_appointment_app/screens/succes_booked.dart';
 import 'package:flutter/material.dart';
 import 'package:doctor_appointment_app/utils/config.dart';
 import 'package:doctor_appointment_app/screens/auth_page.dart';
@@ -47,6 +50,9 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const AuthPage(),
         'main': (context) => const MainLayout(),
+        'doctor_details': (context) => const DoctorDetails(),
+        'booking_page': (context) => BookingPage(),
+        'success_booking': (context) => const AppointmentBooked(),
       },
     );
   }

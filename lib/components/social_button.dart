@@ -20,7 +20,7 @@ class SocialButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
-            Image.asset('assets/$social.png', width: 40, height: 40),
+            Image.asset('assets/$social.png', width: 25, height: 25),
             Text(
               social.toUpperCase(),
               style: const TextStyle(color: Colors.black),

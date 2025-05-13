@@ -2,9 +2,11 @@ import 'package:doctor_appointment_app/utils/config.dart';
 import 'package:flutter/material.dart';
 
 class DoctorCard extends StatelessWidget {
-  const DoctorCard({Key? key, required this.route}) : super(key: key);
+  const DoctorCard({Key? key, required this.route, required this.doctor})
+    : super(key: key);
 
   final String route;
+  final Map<String, dynamic> doctor; //receive doctor details
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +22,10 @@ class DoctorCard extends StatelessWidget {
             children: [
               SizedBox(
                 width: Config.widthSize * 0.33,
-                child: Image.asset('assets/doctor_2.jpg', fit: BoxFit.fill),
+                child: Image.network(
+                  "http://192.168.1.223:8000${doctor['doctor_profile']}",
+                  fit: BoxFit.fill,
+                ),
               ),
               Flexible(
                 child: Padding(
@@ -31,16 +36,16 @@ class DoctorCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      const Text(
-                        'Dr Richard Tan',
-                        style: TextStyle(
+                      Text(
+                        "Dr ${doctor['doctor_name']}",
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const Text(
-                        'Dental',
-                        style: TextStyle(
+                      Text(
+                        "${doctor['category']}",
+                        style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.normal,
                         ),
@@ -71,8 +76,8 @@ class DoctorCard extends StatelessWidget {
           ),
         ),
         onTap: () {
-          Navigator.of(context).pushNamed(route);
-        }, //redirect to doctor details
+          Navigator.of(context).pushNamed(route, arguments: doctor);
+        },
       ),
     );
   }

@@ -35,23 +35,11 @@ class _HomePageState extends State<HomePage> {
     if (token.isNotEmpty && token != 'null') {
       //get user data from api
       final response = await DioProvider().getUser(token);
-      //.......if (response != null) {
-      //.......  setState(() {
-      //decode json data
-      //.......    user = jsonDecode(response);
-      //.......  });
-      //.......}
-      if (response is String) {
-        try {
-          final decoded = jsonDecode(response);
-          setState(() {
-            user = decoded;
-          });
-        } catch (e) {
-          print("Error al decodificar JSON: $e");
-        }
-      } else {
-        print("Error al obtener el usuario: $response");
+      if (response != null) {
+        setState(() {
+          user = jsonDecode(response);
+          print(user);
+        });
       }
     }
   }
@@ -157,9 +145,17 @@ class _HomePageState extends State<HomePage> {
                 //doctor card here
                 Config.spaceSmall,
                 Column(
-                  children: List.generate(10, (index) {
-                    return const DoctorCard(route: 'doctor_details');
-                  }),
+                  children:
+                      user['doctor'] != null
+                          ? List.generate(user['doctor'].length, (index) {
+                            return DoctorCard(
+                              route: 'doctor_details',
+                              doctor: user['doctor'][index],
+                            );
+                          })
+                          : [
+                            Text('No doctors available'),
+                          ], // Mensaje en caso de que no haya datos
                 ),
               ],
             ),

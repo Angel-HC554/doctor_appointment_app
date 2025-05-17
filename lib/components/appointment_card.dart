@@ -3,7 +3,10 @@ import 'package:doctor_appointment_app/main.dart';
 import 'package:doctor_appointment_app/utils/config.dart';
 
 class AppointmentCard extends StatefulWidget {
-  AppointmentCard({Key? key}) : super(key: key);
+  AppointmentCard({Key? key, required this.doctor, required this.color})
+    : super(key: key);
+  final Map<String, dynamic> doctor;
+  final Color color;
 
   @override
   State<AppointmentCard> createState() => _AppointmentCardState();
@@ -15,7 +18,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Config.primaryColor,
+        color: widget.color,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Material(
@@ -26,29 +29,32 @@ class _AppointmentCardState extends State<AppointmentCard> {
             children: <Widget>[
               Row(
                 children: [
-                  const CircleAvatar(
-                    backgroundImage: AssetImage(
-                      'assets/doctor_1.jpg',
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(
+                      "http://192.168.1.223:8000${widget.doctor['doctor_profile']}",
                     ), //imagen de doctor
                   ),
                   const SizedBox(width: 10),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const <Widget>[
+                    children: <Widget>[
                       Text(
-                        'Dr Richard Tan',
-                        style: TextStyle(color: Colors.white),
+                        'Dr ${widget.doctor['doctor_name']}',
+                        style: const TextStyle(color: Colors.white),
                       ),
-                      SizedBox(height: 2),
-                      Text('Dental', style: TextStyle(color: Colors.black)),
+                      const SizedBox(height: 2),
+                      Text(
+                        widget.doctor['category'],
+                        style: const TextStyle(color: Colors.black),
+                      ),
                     ],
                   ),
                 ],
               ),
               Config.spaceSmall,
               //Schedule info
-              const ScheduleCard(),
+              ScheduleCard(appointment: widget.doctor['appointments']),
               Config.spaceSmall,
               //Action button
               Row(
@@ -91,7 +97,8 @@ class _AppointmentCardState extends State<AppointmentCard> {
 
 //Schedule Widget
 class ScheduleCard extends StatelessWidget {
-  const ScheduleCard({Key? key}) : super(key: key);
+  const ScheduleCard({Key? key, required this.appointment}) : super(key: key);
+  final Map<String, dynamic> appointment;
 
   @override
   Widget build(BuildContext context) {
@@ -105,17 +112,20 @@ class ScheduleCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          Icon(Icons.calendar_today, color: Colors.white, size: 15),
-          SizedBox(width: 5),
+          const Icon(Icons.calendar_today, color: Colors.white, size: 15),
+          const SizedBox(width: 5),
           Text(
-            'Monday, 11/28/2025',
+            '${appointment['day']}, ${appointment['date']}',
             style: const TextStyle(color: Colors.white),
           ),
-          SizedBox(width: 20),
-          Icon(Icons.access_alarm, color: Colors.white, size: 17),
-          SizedBox(width: 5),
+          const SizedBox(width: 20),
+          const Icon(Icons.access_alarm, color: Colors.white, size: 17),
+          const SizedBox(width: 5),
           Flexible(
-            child: Text('2:00 PM', style: const TextStyle(color: Colors.white)),
+            child: Text(
+              appointment['time'],
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),

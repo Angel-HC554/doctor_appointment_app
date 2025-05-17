@@ -9,11 +9,11 @@ class DioProvider {
   // Método para obtener la URL base según la plataforma
   String getBaseUrl() {
     if (kIsWeb) {
-      return 'http://10.64.134.147:8000/api'; // URL para Web
+      return 'http://192.168.1.223:8000/api'; // URL para Web
     } else if (Platform.isAndroid) {
       return 'http://10.0.2.2:8000/api'; // URL para Android (emulador)
     } else {
-      return 'http://10.64.134.147:8000/api'; // URL para iOS u otras plataformas
+      return 'http://192.168.1.223:8000/api'; // URL para iOS u otras plataformas
     }
   }
 
@@ -99,8 +99,26 @@ class DioProvider {
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 
-      if (response.statusCode == 200 && response.data != '') {
+      if (response.statusCode == 200 && response.data != 'data') {
         return response.statusCode;
+      } else {
+        return 'Error';
+      }
+    } catch (error) {
+      return error;
+    }
+  }
+
+  //retrieve booking details
+  Future<dynamic> getAppointments(String token) async {
+    try {
+      var response = await Dio().get(
+        '${getBaseUrl()}/appointments',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      if (response.statusCode == 200 && response.data != 'data') {
+        return json.encode(response.data);
       } else {
         return 'Error';
       }

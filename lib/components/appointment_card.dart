@@ -1,6 +1,9 @@
+import 'package:doctor_appointment_app/providers/dio_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:doctor_appointment_app/main.dart';
 import 'package:doctor_appointment_app/utils/config.dart';
+import 'package:rating_dialog/rating_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AppointmentCard extends StatefulWidget {
   AppointmentCard({Key? key, required this.doctor, required this.color})
@@ -78,11 +81,57 @@ class _AppointmentCardState extends State<AppointmentCard> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                       ),
+                      onPressed: () async {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return RatingDialog(
+                              initialRating: 1.0,
+                              title: const Text(
+                                'Rate the Doctor',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              message: const Text(
+                                'Please help us to rate our Doctor',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: 15),
+                              ),
+                              image: const FlutterLogo(size: 100),
+                              submitButtonText: 'Submit',
+                              commentHint: 'Your Reviews',
+                              onSubmitted: (response) async {
+                                final SharedPreferences prefs =
+                                    await SharedPreferences.getInstance();
+                                final token = prefs.getString('token') ?? '';
+
+                                final rating = await DioProvider().storeReviews(
+                                  response.comment,
+                                  response.rating,
+                                  widget
+                                      .doctor['appointments']['id'], //this is appointment id
+                                  widget.doctor['doc_id'], //this is doctor id
+                                  token,
+                                );
+
+                                //if successful, then refresh
+                                if (rating == 200 && rating != '') {
+                                  MyApp.navigatorKey.currentState!.pushNamed(
+                                    'main',
+                                  );
+                                }
+                              },
+                            );
+                          },
+                        );
+                      },
                       child: const Text(
                         'Completed',
                         style: TextStyle(color: Colors.white),
                       ),
-                      onPressed: () {},
                     ),
                   ),
                 ],

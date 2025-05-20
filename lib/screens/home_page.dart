@@ -1,12 +1,14 @@
-import 'dart:convert';
+//import 'dart:convert';
 
 import 'package:doctor_appointment_app/components/appointment_card.dart';
 import 'package:doctor_appointment_app/components/doctor_card.dart';
-import 'package:doctor_appointment_app/providers/dio_provider.dart';
+import 'package:doctor_appointment_app/models/auth_model.dart';
+//import 'package:doctor_appointment_app/providers/dio_provider.dart';
 import 'package:doctor_appointment_app/utils/config.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+//import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -18,6 +20,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   Map<String, dynamic> user = {};
   Map<String, dynamic> doctor = {};
+  List<dynamic> favList = [];
   //
   List<Map<String, dynamic>> medCat = [
     {"icon": FontAwesomeIcons.userDoctor, "category": "General"},
@@ -28,39 +31,14 @@ class _HomePageState extends State<HomePage> {
     {"icon": FontAwesomeIcons.teeth, "category": "Dental"},
   ];
 
-  Future<void> getData() async {
-    //get token from shared preferences
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token') ?? '';
-
-    if (token.isNotEmpty && token != 'null') {
-      //get user data from api
-      final response = await DioProvider().getUser(token);
-      if (response != null) {
-        setState(() {
-          user = jsonDecode(response);
-          for (var doctorData in user['doctor']) {
-            //if there is appointment return for today
-            //then pass the doctor info
-            if (doctorData['appointments'] != null) {
-              doctor = doctorData;
-            }
-          }
-        });
-      }
-    }
-  }
-
-  @override
-  void initState() {
-    getData();
-    super.initState();
-  }
-
   //
   @override
   Widget build(BuildContext context) {
     Config().init(context);
+    user = Provider.of<AuthModel>(context, listen: false).getUser;
+    doctor = Provider.of<AuthModel>(context, listen: false).getAppointment;
+    favList = Provider.of<AuthModel>(context, listen: false).getFav;
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
@@ -179,8 +157,13 @@ class _HomePageState extends State<HomePage> {
                       user['doctor'] != null
                           ? List.generate(user['doctor'].length, (index) {
                             return DoctorCard(
-                              route: 'doctor_details',
                               doctor: user['doctor'][index],
+                              isFav:
+                                  favList.contains(
+                                        user['doctor'][index]['doc_id'],
+                                      )
+                                      ? true
+                                      : false,
                             );
                           })
                           : [

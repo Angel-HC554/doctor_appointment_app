@@ -104,7 +104,7 @@ class _SignUpFormState extends State<SignUpForm> {
                     );
 
                     if (token) {
-                      auth.loginSuccess(); //update login status
+                      auth.loginSuccess({}, {}); //update login status
                       //rediret to main page
                       MyApp.navigatorKey.currentState!.pushNamed('main');
                     }

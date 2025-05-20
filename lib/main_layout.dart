@@ -1,4 +1,6 @@
+import 'package:doctor_appointment_app/screens/fav_page.dart';
 import 'package:doctor_appointment_app/screens/home_page.dart';
+import 'package:doctor_appointment_app/screens/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:doctor_appointment_app/screens/appointment_page.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -24,7 +26,12 @@ class _MainLayoutState extends State<MainLayout> {
             currentPage = value;
           });
         }),
-        children: const <Widget>[HomePage(), AppointmentPage()],
+        children: <Widget>[
+          const HomePage(),
+          FavPage(),
+          const AppointmentPage(),
+          ProfilePage(),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentPage,
@@ -44,8 +51,16 @@ class _MainLayoutState extends State<MainLayout> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
+            icon: FaIcon(FontAwesomeIcons.solidHeart),
+            label: 'Favorites',
+          ),
+          BottomNavigationBarItem(
             icon: FaIcon(FontAwesomeIcons.solidCalendarCheck),
             label: 'Appointments',
+          ),
+          BottomNavigationBarItem(
+            icon: FaIcon(FontAwesomeIcons.solidUser),
+            label: 'Profile',
           ),
         ],
       ),

@@ -1,22 +1,38 @@
 import 'package:doctor_appointment_app/components/button.dart';
+import 'package:doctor_appointment_app/models/auth_model.dart';
+import 'package:doctor_appointment_app/providers/dio_provider.dart';
 import 'package:doctor_appointment_app/utils/config.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:doctor_appointment_app/components/custom_appbar.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DoctorDetails extends StatefulWidget {
-  const DoctorDetails({Key? key}) : super(key: key);
+  const DoctorDetails({Key? key, required this.doctor, required this.isFav})
+    : super(key: key);
+  final Map<String, dynamic> doctor;
+  final bool isFav;
 
   @override
   State<DoctorDetails> createState() => _DoctorDetailsState();
 }
 
 class _DoctorDetailsState extends State<DoctorDetails> {
+  Map<String, dynamic> doctor = {};
   bool isFav = false;
+
+  @override
+  void initState() {
+    doctor = widget.doctor;
+    isFav = widget.isFav;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     //get arguments from doctor card
-    final doctor = ModalRoute.of(context)!.settings.arguments as Map;
+    //final doctor = ModalRoute.of(context)!.settings.arguments as Map;
     return Scaffold(
       appBar: CustomAppBar(
         appTitle: 'Doctor Details',
@@ -25,7 +41,36 @@ class _DoctorDetailsState extends State<DoctorDetails> {
           //Favarite Button
           IconButton(
             //press this button to add/remove favorite doctor
-            onPressed: () {},
+            onPressed: () async {
+              final list =
+                  Provider.of<AuthModel>(context, listen: false).getFav;
+              //if doc id is already exist, mean remove the doc id
+              if (list.contains(doctor['doc_id'])) {
+                list.removeWhere((id) => id == doctor['doc_id']);
+              } else {
+                //else, add new doctor to favorite list
+                list.add(doctor['doc_id']);
+              }
+              //update the list into auth model and notify all widgets
+              Provider.of<AuthModel>(context, listen: false).setFavList(list);
+
+              final SharedPreferences prefs =
+                  await SharedPreferences.getInstance();
+              final token = prefs.getString('token') ?? '';
+
+              if (token.isNotEmpty && token != '') {
+                //update the favorite list into database
+                final response = await DioProvider().storeFavDoc(token, list);
+                //if insert successfully, then change the favorite status
+
+                if (response == 200) {
+                  setState(() {
+                    isFav = !isFav;
+                  });
+                }
+              }
+            },
+
             icon: FaIcon(
               isFav ? Icons.favorite_rounded : Icons.favorite_outline,
               color: Colors.red,

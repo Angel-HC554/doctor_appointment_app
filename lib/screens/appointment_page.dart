@@ -111,7 +111,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                   alignment: _alignment,
                   duration: const Duration(milliseconds: 200),
                   child: Container(
-                    width: 120,
+                    width: 200,
                     height: 40,
                     decoration: BoxDecoration(
                       color: Config.primaryColor,

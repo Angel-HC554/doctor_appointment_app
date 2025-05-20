@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:doctor_appointment_app/main.dart';
 import 'package:doctor_appointment_app/models/auth_model.dart';
 import 'package:doctor_appointment_app/providers/dio_provider.dart';
@@ -5,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:doctor_appointment_app/utils/config.dart';
 import 'package:doctor_appointment_app/components/button.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({Key? key}) : super(key: key);
@@ -82,9 +85,32 @@ class _LoginFormState extends State<LoginForm> {
                     _passController.text,
                   );
                   if (token) {
-                    auth.loginSuccess(); //update login status
+                    //auth.loginSuccess(); //update login status
                     //redirect to main page
-                    MyApp.navigatorKey.currentState!.pushNamed('main');
+                    //get token from shared preferences
+                    final SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    final tokenValue = prefs.getString('token') ?? '';
+
+                    if (tokenValue.isNotEmpty && tokenValue != 'null') {
+                      //get user data from api
+                      final response = await DioProvider().getUser(tokenValue);
+                      if (response != null) {
+                        setState(() {
+                          Map<String, dynamic> appointment = {};
+                          final user = jsonDecode(response);
+                          for (var doctorData in user['doctor']) {
+                            //if there is appointment return for today
+                            //then pass the doctor info
+                            if (doctorData['appointments'] != null) {
+                              appointment = doctorData;
+                            }
+                          }
+                          auth.loginSuccess(user, appointment);
+                          MyApp.navigatorKey.currentState!.pushNamed('main');
+                        });
+                      }
+                    }
                   }
                 },
                 disable: false,
